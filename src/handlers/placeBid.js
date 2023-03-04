@@ -1,12 +1,20 @@
 import AWS from "aws-sdk";
-import createError from "http-errors";
+import createHttpError from "http-errors";
 import { commonMiddleware } from "../lib/commonMiddleware";
+import { getAuctionById } from "../utils/getAuctionById";
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 async function placeBid(event, context) {
   const { id } = event.pathParameters;
   const { amount } = event.body;
+  const auction = await getAuctionById(id);
+
+  if (amount <= auction.highestBid.amount) {
+    throw new createHttpError.Forbidden(
+      `Your bid must be higher than ${auction.highestBid.amount}!`
+    );
+  }
 
   const params = {
     TableName: process.env.AUCTIONS_TABLE_NAME,
@@ -27,7 +35,7 @@ async function placeBid(event, context) {
   } catch (error) {
     console.error(error);
 
-    throw new createError.InternalServerError(error);
+    throw new createHttpError.InternalServerError(error);
   }
 
   return {
