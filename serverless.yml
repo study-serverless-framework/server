@@ -11,11 +11,7 @@ provider:
   memorySize: 512
   region: us-east-1
   iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:PutItem
-      Resource:
-        - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/AuctionsTable
+    - ${file(iam/AuctionsTableIAM.yaml):AuctionsTableIAM}
 
 functions:
   createAuction:
@@ -27,14 +23,4 @@ functions:
 
 resources:
   Resources:
-    AuctionsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: AuctionsTable
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
+    AuctionsTable: ${file(resources/AuctionsTable.yaml):AuctionsTable}
