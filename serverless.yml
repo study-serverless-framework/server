@@ -9,7 +9,10 @@ provider:
   profile: study-serverless
   runtime: nodejs16.x
   memorySize: 512
+  stage: ${opt:stage, 'dev'}
   region: us-east-1
+  environment:
+    AUCTIONS_TABLE_NAME: ${self:custom.AuctionsTable.name}
   iamRoleStatements:
     - ${file(iam/AuctionsTableIAM.yaml):AuctionsTableIAM}
 
@@ -24,3 +27,8 @@ functions:
 resources:
   Resources:
     AuctionsTable: ${file(resources/AuctionsTable.yaml):AuctionsTable}
+
+custom:
+  AuctionsTable:
+    name: !Ref AuctionsTable
+    arn: !GetAtt AuctionsTable.Arn

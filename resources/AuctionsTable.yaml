@@ -1,7 +1,7 @@
 AuctionsTable:
   Type: AWS::DynamoDB::Table
   Properties:
-    TableName: AuctionsTable
+    TableName: AuctionsTable-${self:provider.stage}
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
