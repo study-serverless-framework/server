@@ -1,7 +1,10 @@
 import AWS from "aws-sdk";
 import createHttpError from "http-errors";
+import validator from "@middy/validator";
+import { transpileSchema } from "@middy/validator/transpile";
 import { commonMiddleware } from "../lib/commonMiddleware";
 import { getAuctionById } from "../utils/getAuctionById";
+import { schema as placeBidSchema } from "../lib/schemas/placeBid.schema";
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
@@ -48,4 +51,8 @@ async function placeBid(event, context) {
   };
 }
 
-export const handler = commonMiddleware(placeBid);
+export const handler = commonMiddleware(placeBid).use(
+  validator({
+    eventSchema: transpileSchema(placeBidSchema),
+  })
+);
